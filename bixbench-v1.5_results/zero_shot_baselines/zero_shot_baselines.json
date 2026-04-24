@@ -1,0 +1,50 @@
+{
+    "gpt-4o-grader-mcq-refusal-True_graded": {
+        "accuracy": 0.01951219512195122,
+        "precision": 0.25,
+        "coverage": 0.07804878048780488,
+        "n_total": 205,
+        "n_correct": 4,
+        "n_sure": 16
+    },
+    "gpt-5.4-grader-mcq-refusal-False_graded": {
+        "accuracy": 0.28780487804878047,
+        "precision": 0.28780487804878047,
+        "coverage": 1.0,
+        "n_total": 205,
+        "n_correct": 59,
+        "n_sure": 205
+    },
+    "gpt-5.4-grader-openended_graded": {
+        "accuracy": 0.05365853658536585,
+        "precision": 0.05365853658536585,
+        "coverage": 1.0,
+        "n_total": 205,
+        "n_correct": 11,
+        "n_sure": 205
+    },
+    "gpt-4o-grader-openended_graded": {
+        "accuracy": 0.02926829268292683,
+        "precision": 0.02926829268292683,
+        "coverage": 1.0,
+        "n_total": 205,
+        "n_correct": 6,
+        "n_sure": 205
+    },
+    "gpt-5.4-grader-mcq-refusal-True_graded": {
+        "accuracy": 0.06829268292682927,
+        "precision": 0.3684210526315789,
+        "coverage": 0.18536585365853658,
+        "n_total": 205,
+        "n_correct": 14,
+        "n_sure": 38
+    },
+    "gpt-4o-grader-mcq-refusal-False_graded": {
+        "accuracy": 0.32195121951219513,
+        "precision": 0.32195121951219513,
+        "coverage": 1.0,
+        "n_total": 205,
+        "n_correct": 66,
+        "n_sure": 205
+    }
+}

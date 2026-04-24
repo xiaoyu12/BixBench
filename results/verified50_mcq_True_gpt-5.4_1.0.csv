@@ -1,0 +1,2 @@
+uuid,source_id,question_id,question,predicted,target,unsure,evaluation_mode,capsule_uuid,data_folder,short_id
+bix-12-q2,1162e770-63fa-4625-9724-b038339edc61,bix-12-q2,What is the median percentage of parsimony informative sites across fungal gene alignments?,D,E,A,llm_verifier,d38392ec-84b8-485d-ab02-b8788e6f1f43,CapsuleFolder-d38392ec-84b8-485d-ab02-b8788e6f1f43.zip,bix-12

@@ -1,0 +1,8 @@
+{
+    "accuracy": 0.01951219512195122,
+    "precision": 0.25,
+    "coverage": 0.07804878048780488,
+    "n_total": 205,
+    "n_correct": 4,
+    "n_sure": 16
+}

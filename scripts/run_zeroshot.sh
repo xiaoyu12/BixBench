@@ -80,15 +80,20 @@ run_zero_shot() {
 
 
 if true; then
-    print_status "Running GPT-4o zero-shot evaluations..."
-    run_zero_shot "openanswer" "gpt-4o" "" "gpt-4o-grader-openended.csv"
-    run_zero_shot "mcq" "gpt-4o" "--with-refusal" "gpt-4o-grader-mcq-refusal-True.csv"
-    run_zero_shot "mcq" "gpt-4o" "" "gpt-4o-grader-mcq-refusal-False.csv"
+    # print_status "Running GPT-4o zero-shot evaluations..."
+    # run_zero_shot "openanswer" "gpt-4o" "" "gpt-4o-grader-openended.csv"
+    # run_zero_shot "mcq" "gpt-4o" "--with-refusal" "gpt-4o-grader-mcq-refusal-True.csv"
+    # run_zero_shot "mcq" "gpt-4o" "" "gpt-4o-grader-mcq-refusal-False.csv"
 
-    print_status "Running Claude-3.5-Sonnet zero-shot evaluations..."
-    run_zero_shot "openanswer" "claude-3-5-sonnet-latest" "" "claude-3-5-sonnet-latest-grader-openended.csv"
-    run_zero_shot "mcq" "claude-3-5-sonnet-latest" "--with-refusal" "claude-3-5-sonnet-latest-grader-mcq-refusal-True.csv"
-    run_zero_shot "mcq" "claude-3-5-sonnet-latest" "" "claude-3-5-sonnet-latest-grader-mcq-refusal-False.csv"
+    # print_status "Running Claude-3.5-Sonnet zero-shot evaluations..."
+    # run_zero_shot "openanswer" "claude-3-5-sonnet-latest" "" "claude-3-5-sonnet-latest-grader-openended.csv"
+    # run_zero_shot "mcq" "claude-3-5-sonnet-latest" "--with-refusal" "claude-3-5-sonnet-latest-grader-mcq-refusal-True.csv"
+    # run_zero_shot "mcq" "claude-3-5-sonnet-latest" "" "claude-3-5-sonnet-latest-grader-mcq-refusal-False.csv"
+
+    print_status "Running GPT-5.4 zero-shot evaluations..."
+    run_zero_shot "openanswer" "gpt-5.4" "" "gpt-5.4-grader-openended.csv"
+    run_zero_shot "mcq" "gpt-5.4" "--with-refusal" "gpt-5.4-grader-mcq-refusal-True.csv"
+    run_zero_shot "mcq" "gpt-5.4" "" "gpt-5.4-grader-mcq-refusal-False.csv"
 fi
 
 echo ""
@@ -119,9 +124,12 @@ grade_zero_shot() {
 grade_zero_shot "gpt-4o-grader-openended.csv" "openanswer"
 grade_zero_shot "gpt-4o-grader-mcq-refusal-True.csv" "mcq"
 grade_zero_shot "gpt-4o-grader-mcq-refusal-False.csv" "mcq"
-grade_zero_shot "claude-3-5-sonnet-latest-grader-openended.csv" "openanswer"
-grade_zero_shot "claude-3-5-sonnet-latest-grader-mcq-refusal-True.csv" "mcq"
-grade_zero_shot "claude-3-5-sonnet-latest-grader-mcq-refusal-False.csv" "mcq"
+# grade_zero_shot "claude-3-5-sonnet-latest-grader-openended.csv" "openanswer"
+# grade_zero_shot "claude-3-5-sonnet-latest-grader-mcq-refusal-True.csv" "mcq"
+# grade_zero_shot "claude-3-5-sonnet-latest-grader-mcq-refusal-False.csv" "mcq"
+grade_zero_shot "gpt-5.4-grader-openended.csv" "openanswer"
+grade_zero_shot "gpt-5.4-grader-mcq-refusal-True.csv" "mcq"
+grade_zero_shot "gpt-5.4-grader-mcq-refusal-False.csv" "mcq"
 
 # Aggregate zero-shot results into a single JSON file
 print_status "Aggregating zero-shot results..."

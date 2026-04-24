@@ -131,6 +131,9 @@ async def as_completed_with_concurrency(
             return await coro
 
     # submit as futures and then gather them as_completed
-    futures = (asyncio.ensure_future(sem_coro(coro)) for coro in coros)
-    async for future in asyncio.as_completed(futures, timeout=timeout):
-        yield future.result()
+    #futures = (asyncio.ensure_future(sem_coro(coro)) for coro in coros)
+    #async for future in asyncio.as_completed(futures, timeout=timeout):
+    #    yield future.result()
+    futures = [asyncio.ensure_future(sem_coro(coro)) for coro in coros]
+    for future in asyncio.as_completed(futures, timeout=timeout):
+        yield await future
