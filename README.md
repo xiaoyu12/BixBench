@@ -32,12 +32,57 @@ This repository enables three separate functions:
 ## Links
 
 - [Installation](#installation)
+- [BixBench-Verified-50 Agent Results](#bixbench-verified-50-agent-results)
 - [Quick Start](#quick-start)
 - [Agentic Evaluations](#agentic-evaluations)
 - [Using Your Own Agent](#using-your-own-agent)
 - [Zero-shot Evaluations & Grading](#zero-shot-evaluations--grading)
 - [Replicating the BixBench Paper Results](#replicating-the-bixbench-paper-results)
 - [Acknowledgments](#acknowledgments)
+
+## BixBench-Verified-50 Agent Results
+
+This repository also contains a three-agent evaluation on
+[BixBench-Verified-50](https://huggingface.co/datasets/phylobio/BixBench-Verified-50),
+the curated 50-question subset discussed in Phylo's
+[biology-agent evaluation post](https://phylo.bio/blog/evaluating-ai-agents-in-biology).
+The goal of this experiment was to test whether current frontier agents,
+when equipped with high-quality scientific skills, can solve realistic
+bioinformatics benchmark questions without human intervention.
+
+### Headline finding
+
+Skill-augmented frontier agents nearly saturate BixBench-Verified-50. The
+best configuration, GPT-5.5 with Claude Scientific Skills, bioSkills, and
+web access, scored **98.0% (49/50)**. The only official miss was
+`bix-16-q1`, where the agent correctly computed Spearman correlations on the
+distributed `CRISPRGeneEffect.csv` sign convention and selected `CCND1`; the
+reference answer is recovered when essentiality is interpreted with the
+opposite sign. This is best treated as a question-wording/sign-convention
+ambiguity rather than a clear computational failure.
+
+| Configuration | Web access | Result directory | Accuracy | Correct/50 |
+|---|---:|---|---:|---:|
+| GPT-5.4 + Claude Scientific Skills | No | `results/codex_agent/` | 88.0% | 44 |
+| Claude Code Opus 4.7 + Claude Scientific Skills | No | `results/claude_code_agent/` | 84.0% | 42 |
+| GPT-5.5 + Claude Scientific Skills + bioSkills | Yes | `results/codex_agent_5.5/` | **98.0%** | **49** |
+
+The result suggests that most residual errors in offline configurations are
+caused by missing external resources such as pathway annotations, organism
+databases, BUSCO HMM profiles, or specialized phylogenetics tools. Web access
+and domain-specific skill files close those gaps for the verified benchmark.
+
+### Manuscript and artifacts
+
+The bioRxiv-style manuscript describing this result is in
+[`bioarxiv-paper/`](bioarxiv-paper/). Key files include:
+
+- `bioarxiv-paper/main.tex` and `bioarxiv-paper/main.pdf` for the manuscript.
+- `bioarxiv-paper/make_figures.py` for regenerating figures.
+- `bioarxiv-paper/per_question_correctness.csv` for the per-question
+  correctness matrix used by the figures.
+- Per-agent `combined.csv`, `combined_graded.json`, and
+  `combined_grading_report.md` files in the result directories listed above.
 
 ## Installation
 
