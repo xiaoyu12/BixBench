@@ -3,6 +3,7 @@ import asyncio
 import json
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -103,13 +104,103 @@ async def grade_answers(
 
     # save query_df as pd
     query_df.to_csv(input_file, index=False)
-    return compute_metrics(query_df["grade"].to_list(), query_df["sure"].to_list())
+    metrics = compute_metrics(query_df["grade"].to_list(), query_df["sure"].to_list())
+    return metrics, query_df
+
+
+def generate_grading_report(
+    query_df: pd.DataFrame,
+    metrics: dict,
+    model_name: str,
+    answer_mode: str,
+    input_file: str,
+) -> str:
+    """Generate a detailed markdown grading report highlighting incorrect answers."""
+    total = len(query_df)
+    correct_count = int(query_df["correct"].sum())
+    incorrect_count = total - correct_count
+    accuracy = correct_count / total * 100 if total > 0 else 0
+
+    incorrect_df = query_df[~query_df["correct"].astype(bool)]
+    correct_df = query_df[query_df["correct"].astype(bool)]
+
+    lines = []
+    lines.append(f"# Grading Report")
+    lines.append(f"")
+    lines.append(f"- **Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    lines.append(f"- **Input file:** `{input_file}`")
+    lines.append(f"- **Model:** {model_name}")
+    lines.append(f"- **Answer mode:** {answer_mode}")
+    lines.append(f"")
+    lines.append(f"## Summary")
+    lines.append(f"")
+    lines.append(f"| Metric | Value |")
+    lines.append(f"|--------|-------|")
+    lines.append(f"| Total questions | {total} |")
+    lines.append(f"| Correct | {correct_count} |")
+    lines.append(f"| Incorrect | {incorrect_count} |")
+    lines.append(f"| Accuracy | {accuracy:.1f}% |")
+    for key, value in metrics.items():
+        display_val = f"{value:.4f}" if isinstance(value, float) else str(value)
+        lines.append(f"| {key} | {display_val} |")
+    lines.append(f"")
+
+    # --- Incorrect answers (highlighted) ---
+    lines.append(f"## ❌ Incorrect Answers ({incorrect_count})")
+    lines.append(f"")
+    if len(incorrect_df) == 0:
+        lines.append("All answers are correct! 🎉")
+        lines.append("")
+    else:
+        for i, (_, row) in enumerate(incorrect_df.iterrows(), 1):
+            qid = row.get("question_id", "N/A")
+            lines.append(f"### {i}. {qid}")
+            lines.append(f"")
+            question_text = str(row.get("question", "N/A"))
+            # Truncate very long questions
+            if len(question_text) > 500:
+                question_text = question_text[:500] + "..."
+            lines.append(f"**Question:** {question_text}")
+            lines.append(f"")
+            lines.append(f"| | Value |")
+            lines.append(f"|---|---|")
+            lines.append(f"| **Expected (target)** | `{row.get('target', 'N/A')}` |")
+            lines.append(f"| **Predicted** | `{row.get('predicted', 'N/A')}` |")
+            lines.append(f"| **Unsure** | `{row.get('unsure', 'N/A')}` |")
+            lines.append(f"| **Grade** | `{row.get('grade', 'N/A')}` |")
+            lines.append(f"")
+            summary = str(row.get("agent_summary", ""))
+            if summary and summary != "nan":
+                if len(summary) > 800:
+                    summary = summary[:800] + "..."
+                lines.append(f"**Agent summary:** {summary}")
+                lines.append(f"")
+            lines.append(f"---")
+            lines.append(f"")
+
+    # --- Correct answers (collapsed) ---
+    lines.append(f"## ✅ Correct Answers ({correct_count})")
+    lines.append(f"")
+    if len(correct_df) == 0:
+        lines.append("No correct answers.")
+        lines.append("")
+    else:
+        lines.append(f"| # | Question ID | Target | Predicted |")
+        lines.append(f"|---|-------------|--------|-----------|")
+        for i, (_, row) in enumerate(correct_df.iterrows(), 1):
+            qid = row.get("question_id", "N/A")
+            target = row.get("target", "N/A")
+            predicted = row.get("predicted", "N/A")
+            lines.append(f"| {i} | {qid} | `{target}` | `{predicted}` |")
+        lines.append(f"")
+
+    return "\n".join(lines)
 
 
 async def main():
     try:
         args = parse_args()
-        metrics = await grade_answers(
+        metrics, query_df = await grade_answers(
             args.input_file,
             args.answer_mode,
             args.model,
@@ -132,6 +223,20 @@ async def main():
         print(f"Saving results to {output_path}")
         with open(os.path.join(output_path), "w") as f:
             json.dump(metrics, f, indent=4)
+
+        # Generate and save detailed grading report
+        report = generate_grading_report(
+            query_df=query_df,
+            metrics=metrics,
+            model_name=args.model,
+            answer_mode=args.answer_mode,
+            input_file=args.input_file,
+        )
+        report_filename = Path(args.input_file).stem + "_grading_report.md"
+        report_path = Path(args.output_dir) / report_filename
+        with open(report_path, "w") as f:
+            f.write(report)
+        print(f"Detailed grading report saved to {report_path}")
 
     except Exception as e:
         print(f"Error: {e!s}", file=sys.stderr)

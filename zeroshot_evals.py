@@ -107,6 +107,67 @@ def load_verified_50_dataset(
     return dataset
 
 
+def print_dataset_details(dataset: pd.DataFrame) -> None:
+    """Print a detailed summary of each question in the dataset."""
+    separator = "-" * 80
+    print("=" * 80)
+    print(f"DATASET OVERVIEW — {len(dataset)} question(s)")
+    print(f"  Unique capsules : {dataset['capsule_uuid'].nunique()}")
+    if "categories" in dataset.columns:
+        all_cats = dataset["categories"].dropna()
+        unique_cats = set()
+        for cats in all_cats:
+            if isinstance(cats, list):
+                unique_cats.update(cats)
+            elif isinstance(cats, str):
+                unique_cats.add(cats)
+        print(f"  Categories       : {', '.join(sorted(unique_cats)) or 'N/A'}")
+    if "eval_mode" in dataset.columns:
+        modes = dataset["eval_mode"].dropna().unique()
+        print(f"  Eval modes       : {', '.join(sorted(modes))}")
+    print("=" * 80)
+
+    for idx, (_, row) in enumerate(dataset.iterrows(), start=1):
+        qid = row.get("question_id") or row.get("id", "N/A")
+        print(f"\n{separator}")
+        print(f"  [{idx}/{len(dataset)}]  Question ID : {qid}")
+        if "short_id" in row and pd.notna(row.get("short_id")):
+            print(f"              Short ID : {row['short_id']}")
+        print(f"              Capsule  : {row.get('capsule_uuid', 'N/A')}")
+        if "categories" in row and row.get("categories"):
+            cats = row["categories"]
+            if isinstance(cats, list):
+                cats = ", ".join(cats)
+            print(f"              Categories: {cats}")
+        if "eval_mode" in row and pd.notna(row.get("eval_mode")):
+            print(f"              Eval mode: {row['eval_mode']}")
+        if "paper" in row and pd.notna(row.get("paper")):
+            paper = str(row["paper"])
+            if len(paper) > 120:
+                paper = paper[:117] + "..."
+            print(f"              Paper    : {paper}")
+        print()
+        question_text = row["question"]
+        if len(question_text) > 500:
+            question_text = question_text[:497] + "..."
+        print(f"  Question : {question_text}")
+        print(f"  Ideal    : {row['ideal']}")
+        distractors = row.get("distractors", [])
+        if distractors:
+            print(f"  Distractors ({len(distractors)}):")
+            for i, d in enumerate(distractors, 1):
+                d_str = str(d)
+                if len(d_str) > 120:
+                    d_str = d_str[:117] + "..."
+                print(f"    {i}. {d_str}")
+        else:
+            print("  Distractors: (none)")
+
+    print(f"\n{'=' * 80}")
+    print(f"END OF DATASET — {len(dataset)} question(s) listed")
+    print("=" * 80)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
@@ -236,6 +297,8 @@ async def main() -> None:
     )
     if args.num_examples > 0:
         dataset = dataset.head(args.num_examples)
+
+    print_dataset_details(dataset)
 
     zeroshot_agent = ZeroshotBaseline(
         answer_mode=args.answer_mode,

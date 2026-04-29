@@ -139,7 +139,11 @@ class TrajectoryGenerator:
         Returns:
             List[Dict[str, Any]]: List of processed benchmark questions
         """
-        bixbench = datasets.load_dataset(self.config.paths.hf_repo_id, split=self.config.dataset_split).to_list()  # type: ignore[attr-defined]
+
+        #bixbench = datasets.load_dataset(self.config.paths.hf_repo_id, split=self.config.dataset_split).to_list()  # type: ignore[attr-defined]
+        bixbench = datasets.load_dataset("json", 
+            data_files=f"{self.config.paths.data_folder}/BixBench-Verified-50.jsonl",
+            split=self.config.dataset_split).to_list()
 
         # Process all capsule data concurrently
         zip_filenames = {question["data_folder"] for question in bixbench}
